@@ -82,7 +82,7 @@ async def cmd_delete_work_task_item(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('select_tasks_'), st.DeleteWorkTasks.category)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(category=callbackData)
     await callback.message.edit_text(f'Вы точно уверены в том что хотите удалить категорию безвозратно ⁉️',
                                      reply_markup=kb.yes_or_no_kb)
@@ -91,7 +91,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('select_tasks_'), st.DeleteTaskItem.category)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(category=callbackData)
     await callback.message.edit_text(f'Теперь выберите план из этой категории который хотите удалить 👇',
                                      reply_markup=await kb.select_tasks_item(callbackData))
@@ -100,7 +100,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('select_tasks_item_'), st.DeleteTaskItem.plan)
 async def cmd_delete_plan_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(plan=callbackData)
     await callback.message.edit_text(f'Вы точно уверены в том что хотите удалить план безвозратно ⁉️',
                                      reply_markup=kb.yes_or_no_kb)
@@ -120,7 +120,7 @@ async def cmd_select_tasks_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('select_tasks_'), st.EditWorkTask.category)
 async def cmd_edit_task_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(category=callbackData)
     await callback.message.edit_text(f'🆕 Как назовём задачу теперь?\n'
                                      f'Напиши новое имя для выбранной задачи 📝\n'
@@ -130,7 +130,7 @@ async def cmd_edit_task_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('select_tasks_'), st.EditTaskItem.category)
 async def cmd_edit_task_item_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(category=callbackData)
     await callback.message.edit_text('Теперь выберите план из этой категории который хотите изменить 👇',
                                      reply_markup=await kb.select_tasks_item(callbackData))
@@ -139,7 +139,7 @@ async def cmd_edit_task_item_process(callback: CallbackQuery, state: FSMContext)
 
 @tasks.callback_query(F.data.startswith('select_tasks_item_'), st.EditTaskItem.plan)
 async def cmd_edit_plan_process(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(plan=callbackData)
     await callback.message.edit_text(f'Теперь выберите пункт который хотите изменить 👇',
                                      reply_markup=kb.pick_tools_kb)
@@ -203,7 +203,7 @@ async def cmd_edit_task_name(message: Message, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('rename_'), st.EditTaskItem.new_info)
 async def cmd_edit_task_info(callback: CallbackQuery, state: FSMContext):
-    callbackData = callback.data.split('_')[-1]
+    callbackData = int(callback.data.split('_')[-1])
     await state.update_data(pick_tools=callbackData)
     if callbackData == 'name':
         await callback.message.edit_text('Теперь введите новое имя для вашего пункта ✏️')
@@ -240,7 +240,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
     if callback.data == 'yes':
         await callback.answer('План был успешно удалена 🎉')
-        await delete_task_item(data['category'])
+        await delete_task_item(data['plan'])
     elif callback.data == 'no':
         await callback.answer('Действие было отменено ❌')
     await delete_last_messages(
