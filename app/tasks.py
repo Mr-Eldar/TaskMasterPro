@@ -203,7 +203,7 @@ async def cmd_edit_task_name(message: Message, state: FSMContext):
 
 @tasks.callback_query(F.data.startswith('rename_'), st.EditTaskItem.new_info)
 async def cmd_edit_task_info(callback: CallbackQuery, state: FSMContext):
-    callbackData = int(callback.data.split('_')[-1])
+    callbackData = callback.data.split('_')[-1]
     await state.update_data(pick_tools=callbackData)
     if callbackData == 'name':
         await callback.message.edit_text('Теперь введите новое имя для вашего пункта ✏️')
