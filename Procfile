@@ -1,1 +1,1 @@
-start: python run.py
+start: bash -c "alembic upgrade head && python bot.py"
