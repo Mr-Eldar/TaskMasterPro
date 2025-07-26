@@ -13,9 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Alembic Config
-config = context.config
-config.set_main_option('sqlalchemy.url', os.getenv("SYNC_DB_URL"))
+config.set_main_option('sqlalchemy.url', os.getenv("SYNC_DB_URL"))  # Railway использует переменные окружения
+
 target_metadata = Base.metadata
 
 
