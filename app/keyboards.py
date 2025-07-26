@@ -10,16 +10,16 @@ ITEM_PER_PAGE = 6
 
 start_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, keyboard=[
     [KeyboardButton(text='Задачи 📝'), KeyboardButton(text='ИИ 💬')],
-    [KeyboardButton(text='Управление задачами ⚙️')]
+    [KeyboardButton(text='Управление планами ⚙️')]
 ])
 
 tasks_management_kb = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text='Добавить Задачу ➕', callback_data='add_work_task'),
-     InlineKeyboardButton(text='Добавить план ➕', callback_data='add_work_task_item')],
-    [InlineKeyboardButton(text='Изменить Задачу ✏️', callback_data='edit_work_task'),
-     InlineKeyboardButton(text='Изменить план ✏️', callback_data='edit_work_task_item')],
-    [InlineKeyboardButton(text='Удалить Задачу ❌', callback_data='remove_work_task'),
-     InlineKeyboardButton(text='Удалить план ❌', callback_data='remove_work_task_item')]
+    [InlineKeyboardButton(text='Добавить План ➕', callback_data='add_work_task'),
+     InlineKeyboardButton(text='Добавить Задачу ➕', callback_data='add_work_task_item')],
+    [InlineKeyboardButton(text='Изменить План ✏️', callback_data='edit_work_task'),
+     InlineKeyboardButton(text='Изменить Задачу ✏️', callback_data='edit_work_task_item')],
+    [InlineKeyboardButton(text='Удалить План ❌', callback_data='remove_work_task'),
+     InlineKeyboardButton(text='Удалить Задачу ❌', callback_data='remove_work_task_item')]
 ])
 
 pick_tools_kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -59,7 +59,7 @@ async def tasks(user_id):
     if not work_tasks:
         keyboard.add(
             InlineKeyboardButton(
-                text="Нет задач 😔",
+                text="Нет планов 😔",
                 callback_data="no_tasks"
             )
         )
@@ -145,6 +145,6 @@ async def tasks_item(category_id, page: int = 1):
 
     if nav_buttons:
         keyboard.row(*nav_buttons)
-    keyboard.row(InlineKeyboardButton(text="🔙 К задачам", callback_data="categories"))
+    keyboard.row(InlineKeyboardButton(text="🔙 К Планам", callback_data="categories"))
 
     return keyboard.as_markup()
