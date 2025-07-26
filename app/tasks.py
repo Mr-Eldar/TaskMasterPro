@@ -143,6 +143,7 @@ async def cmd_edit_plan_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.message(st.AddNewCategory.name)
 async def cmd_add_precess(message: Message, state: FSMContext):
+    await set_user(message.from_user.id)
     await state.update_data(name=message.text)
     data = await state.get_data()
     await add_work_task(data['name'], message.from_user.id)
@@ -170,6 +171,7 @@ async def cmd_add_plan_desc(message: Message, state: FSMContext):
 
 @tasks.message(st.AddNewCategoryPlan.photo)
 async def cmd_add_plan(message: Message, state: FSMContext):
+    await set_user(message.from_user.id)
     if not message.photo:
         await message.answer('Извините но мне нужно чтобы вы отправили фото 🖼')
         return
@@ -207,6 +209,7 @@ async def cmd_edit_task_info(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.DeleteWorkTasks.hisUnderstand)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
+    await set_user(message.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':
@@ -227,6 +230,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.DeleteTaskItem.hisUnderstand)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
+    await set_user(message.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':
@@ -247,6 +251,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.EditWorkTask.hisUnderstand)
 async def cmd_edit_process(callback: CallbackQuery, state: FSMContext):
+    await set_user(message.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':
@@ -275,6 +280,7 @@ async def cmd_edit_task_process(message: Message, state: FSMContext):
 
 @tasks.callback_query(st.EditTaskItem.final)
 async def cmd_edit_task_process(callback: CallbackQuery, state: FSMContext):
+    await set_user(callback.from_user.id)
     data = await state.get_data()
     await callback.answer()
 

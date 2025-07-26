@@ -35,19 +35,20 @@ async def set_status(session, task_id):
 # Add Requests
 
 @connection
-async def add_work_task(session, name, user_id):
-    user = await session.scalar(select(User).where(User.tg_id == user_id))
+async def add_work_task(session, name, tg_id):
+    user = await session.scalar(select(User).where(User.tg_id == tg_id))
 
     if not user:
-        user = User(tg_id=user_id)
+        user = User(tg_id=tg_id)
         session.add(user)
         await session.commit()
 
-    work_task = await session.scalar(select(WorkTasks).where(WorkTasks.name == name))
+    # Проверяем существование задачи
+    work_task = await session.scalar(select(WorkTasks).where(WorkTasks.name == name and WorkTasks.user_id == user.id))
 
     if not work_task:
-        session.add(WorkTasks(user_id=user_id, name=name))
-        await session.commit()
+        session.add(WorkTasks(user_id=user.id, name=name))
+    await session.commit()
 
 
 @connection
