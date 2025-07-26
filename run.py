@@ -6,8 +6,6 @@ from aiogram import Bot, Dispatcher
 from app.user import user
 from app.tasks import tasks
 
-from app.database.models import async_main
-
 from dotenv import load_dotenv
 
 
@@ -24,7 +22,6 @@ async def main():
 
 
 async def startup():
-    await async_main()
     print('Starting up...')
 
 

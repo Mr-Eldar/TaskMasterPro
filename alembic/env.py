@@ -1,8 +1,11 @@
 from logging.config import fileConfig
 import os
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 from alembic import context
 from app.database.models import Base  # путь к твоим моделям
+
+load_dotenv()
 
 # config
 config = context.config
