@@ -36,6 +36,13 @@ async def set_status(session, task_id):
 
 @connection
 async def add_work_task(session, name, user_id):
+    user = await session.scalar(select(User).where(User.tg_id == user_id))
+
+    if not user:
+        user = User(tg_id=user_id)
+        session.add(user)
+        await session.commit()
+
     work_task = await session.scalar(select(WorkTasks).where(WorkTasks.name == name))
 
     if not work_task:
