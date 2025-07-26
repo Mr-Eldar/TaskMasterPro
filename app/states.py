@@ -1,11 +1,6 @@
 from aiogram.fsm.state import State, StatesGroup
 
 
-class Gen(StatesGroup):
-    startChat = State()
-    wait = State()
-
-
 class AddNewCategory(StatesGroup):
     name = State()
 

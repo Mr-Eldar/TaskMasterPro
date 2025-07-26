@@ -7,7 +7,6 @@ from aiogram.filters import CommandStart, Command, StateFilter
 from app.database.requests import *
 import app.keyboards as kb
 import app.states as st
-from app.generators import text_generation
 
 user = Router()
 
@@ -33,35 +32,6 @@ async def cmd_menu(message: Message):
                         '🔄 <b>/task_managment</b> — управление задачами\n\n'
                         '💡 Быстрый доступ к функциям — выбирай действие!\n\n'
                         '<b>Используй кнопки ниже или вводи команды вручную</b>', reply_markup=kb.start_kb, parse_mode=ParseMode.HTML)
-
-
-@user.message(Command('chat'))
-@user.message(F.text == 'ИИ 💬')
-async def cmd_ii_chat(message: Message, state: FSMContext):
-    await state.set_state(st.Gen.startChat)
-    await message.answer('🤖 <b>Диалог с ИИ</b>\n'
-                        'Задавай любые вопросы: от погоды до программирования, от рецептов до советов'
-                        'ИИ постарается помочь тебе максимально точно и понятно.\n\n'
-                        '💬 <b>Просто начни писать — ИИ ответит!</b>', reply_markup=kb.stop_chat, parse_mode=ParseMode.HTML)
-
-
-@user.message(F.text == 'Закончить диалог ❌')
-async def stop_chat(message: Message, state: FSMContext):
-    await message.answer('Диалог был закончен ✅')
-    await state.clear()
-
-
-@user.message(StateFilter(st.Gen.startChat))
-async def generating(message: Message, state: FSMContext):
-    await state.set_state(st.Gen.wait)
-    response = await text_generation(message.text)
-    await message.answer(response, parse_mode=ParseMode.MARKDOWN)
-    await state.set_state(st.Gen.startChat)
-
-
-@user.message(StateFilter(st.Gen.wait))
-async def waiting_text_generation(message: Message):
-    await message.answer('Подождите, ваш запрос обрабатывается ⌛️')
 
 
 @user.message(Command('tasks'))
