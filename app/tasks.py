@@ -36,42 +36,47 @@ async def cmd_add_new_category_process(callback: CallbackQuery, state: FSMContex
 
 @tasks.callback_query(F.data == 'add_work_task_item')
 async def cmd_add_plan_process(callback: CallbackQuery, state: FSMContext):
+    user_id = await get_user_id_by_tg_id(callback.from_user.id)
     await callback.message.edit_text('Выберите задачу в которую хотите добавить план 🚀',
-                                     reply_markup=await kb.select_tasks(callback.from_user.id))
+                                     reply_markup=await kb.select_tasks(user_id))
     await state.set_state(st.AddNewCategoryPlan.category)
 
 
 @tasks.callback_query(F.data == 'edit_work_task')
 async def cmd_edit_work_task(callback: CallbackQuery, state: FSMContext):
+    user_id = await get_user_id_by_tg_id(callback.from_user.id)
     await callback.answer()
     await callback.message.edit_text('♻️ <b>Передумал? Меняем!</b>\n'
                                      'Эта команда поможет тебе ✍️ переименовать задачу или ✏️ подправить описание, если что-то изменилось.\n\n'
-                                     'Просто укажи 🆔 ID задачи — и вперёд!', reply_markup=await kb.select_tasks(callback.from_user.id), parse_mode=ParseMode.HTML)
+                                     'Просто укажи 🆔 ID задачи — и вперёд!', reply_markup=await kb.select_tasks(user_id), parse_mode=ParseMode.HTML)
     await state.set_state(st.EditWorkTask.category)
 
 
 @tasks.callback_query(F.data == 'edit_work_task_item')
 async def cmd_edit_task_item(callback: CallbackQuery, state: FSMContext):
+    user_id = await get_user_id_by_tg_id(callback.from_user.id)
     await callback.answer()
     await callback.message.edit_text('♻️ <b>Передумал? Меняем!</b>\n'
                                      'Эта команда поможет тебе ✍️ переименовать план или ✏️ подправить имя, описание или картинку если что-то изменилось.\n\n'
-                                     'Просто укажи 🆔 ID задачи — и вперёд!', reply_markup=await kb.select_tasks(callback.from_user.id), parse_mode=ParseMode.HTML)
+                                     'Просто укажи 🆔 ID задачи — и вперёд!', reply_markup=await kb.select_tasks(user_id), parse_mode=ParseMode.HTML)
     await state.set_state(st.EditTaskItem.category)
 
 
 @tasks.callback_query(F.data == 'remove_work_task')
 async def cmd_delete_work_task_item(callback: CallbackQuery, state: FSMContext):
+    user_id = await get_user_id_by_tg_id(callback.from_user.id)
     await callback.answer()
-    await callback.message.edit_text('🗂 Завершил задачу? Смело удаляй и двигайся дальше 🚀✅\n\n', reply_markup=await kb.select_tasks(callback.from_user.id))
+    await callback.message.edit_text('🗂 Завершил задачу? Смело удаляй и двигайся дальше 🚀✅\n\n', reply_markup=await kb.select_tasks(user_id))
     await state.set_state(st.DeleteWorkTasks.category)
 
 
 @tasks.callback_query(F.data == 'remove_work_task_item')
 async def cmd_delete_work_task_item(callback: CallbackQuery, state: FSMContext):
+    user_id = await get_user_id_by_tg_id(callback.from_user.id)
     await callback.answer()
     await callback.message.edit_text('🗂 Завершил план? Смело удаляй и двигайся дальше 🚀✅\n\n'
                                      'Для начала выбери категорию из которой хочешь удалить план 👇',
-                                     reply_markup=await kb.select_tasks(callback.from_user.id))
+                                     reply_markup=await kb.select_tasks(user_id))
     await state.set_state(st.DeleteTaskItem.category)
 
 
@@ -209,7 +214,7 @@ async def cmd_edit_task_info(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.DeleteWorkTasks.hisUnderstand)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
-    await set_user(message.from_user.id)
+    await set_user(callback.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':
@@ -230,7 +235,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.DeleteTaskItem.hisUnderstand)
 async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
-    await set_user(message.from_user.id)
+    await set_user(callback.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':
@@ -251,7 +256,7 @@ async def cmd_delete_process(callback: CallbackQuery, state: FSMContext):
 
 @tasks.callback_query(st.EditWorkTask.hisUnderstand)
 async def cmd_edit_process(callback: CallbackQuery, state: FSMContext):
-    await set_user(message.from_user.id)
+    await set_user(callback.from_user.id)
     data = await state.get_data()
 
     if callback.data == 'yes':

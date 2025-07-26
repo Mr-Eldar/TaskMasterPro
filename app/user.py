@@ -69,11 +69,16 @@ async def waiting_text_generation(message: Message):
 @user.callback_query(F.data == 'categories')
 async def cmd_tasks(event: Message | CallbackQuery):
     if isinstance(event, Message):
+        user_id = await get_user_id_by_tg_id(event.from_user.id)
+
+        if user_id is None:
+            await event.answer("❗️Ошибка: пользователь не найден в базе.")
+            return
         await event.answer_sticker(sticker='CAACAgUAAxkBAAEPAZJogUkSBVK_3SoQIsgrQZS5V3ugswACHQ0AAsWB2VXEazw9gagmazYE')
         await event.answer('📋 Ваши текущие задачи\n\n'
                         'Здесь отображается полный список активных задач. Для управления используйте соответствующие команды.\n\n'
                         'ℹ️ <i>Чтобы добавить, изменить или удалить задачу — воспользуйтесь командой <b>Упарвление задачами</b> или <b>/task_management:</b></i>.',
-                        reply_markup=await kb.tasks(event.from_user.id), parse_mode=ParseMode.HTML)
+                        reply_markup=await kb.tasks(user_id), parse_mode=ParseMode.HTML)
     else:
         await event.answer()
         await event.message.edit_text('<b>📋 Ваши текущие задачи</b>\n\n'

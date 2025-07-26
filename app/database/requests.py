@@ -77,6 +77,18 @@ async def get_task_item_info(session, task_item_id):
     return await session.scalar(select(WorkTaskItem).where(WorkTaskItem.id == task_item_id))
 
 
+@connection
+async def get_user_id_by_tg_id(session, tg_id):
+    user = await session.scalar(select(User).where(User.tg_id == tg_id))
+    if not user:
+        user = User(tg_id=tg_id)
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+    return user.id
+
+
+
 # Delete Requests
 
 @connection
