@@ -23,7 +23,7 @@ async def main():
 
 
 async def startup():
-    async_main()
+    await async_main()
     print('Starting up...')
 
 
