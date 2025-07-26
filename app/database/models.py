@@ -1,6 +1,16 @@
+import os
+from dotenv import load_dotenv
+
 from sqlalchemy import ForeignKey, String, BigInteger, Integer, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+
+load_dotenv()
+
+engine = create_async_engine(url=os.getenv('DB_URL'),
+                             echo=True)
+    
+async_session = async_sessionmaker(engine)
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -36,3 +46,8 @@ class WorkTaskItem(Base):
     status: Mapped[bool] = mapped_column(Boolean, default=False)
 
     task: Mapped['WorkTasks'] = relationship("WorkTasks", back_populates="items")
+
+
+async def async_main():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
