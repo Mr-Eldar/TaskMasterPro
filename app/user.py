@@ -42,7 +42,7 @@ async def cmd_tasks(event: Message | CallbackQuery):
         user_id = await get_user_id_by_tg_id(event.from_user.id)
 
         if user_id is None:
-            await event.answer("❗️Ошибка: пользователь не найден в базе.")
+            await event.answer("❗️Ошибка: пользователь не найден в базе данных.")
             return
         await event.answer_sticker(sticker='CAACAgUAAxkBAAEPAZJogUkSBVK_3SoQIsgrQZS5V3ugswACHQ0AAsWB2VXEazw9gagmazYE')
         await event.answer('📋 Ваши текущие планы\n\n'
