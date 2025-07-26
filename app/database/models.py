@@ -1,4 +1,5 @@
 import os
+import ssl
 from dotenv import load_dotenv
 
 from sqlalchemy import ForeignKey, String, BigInteger, Integer, Boolean
@@ -7,8 +8,12 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 
 load_dotenv()
 
-engine = create_async_engine(url=os.getenv('DB_URL'),
-                            echo=True)
+ssl_context = ssl.create_default_context()
+engine = create_async_engine(
+    url=os.getenv("DATABASE_URL"),
+    connect_args={"ssl": ssl_context},
+    echo=True,
+)
     
 async_session = async_sessionmaker(engine)
 
