@@ -75,9 +75,6 @@ async def chatting(message: Message, state: FSMContext):
         history.append(f"AI: {response}")
         
         await state.update_data(chat_history=history[-100:])
-        
-        await message.answer(response, parse_mode=ParseMode.MARKDOWN)
-        
     except Exception as e:
         await message.answer(f'Произошла ошибка: {str(e)}')
     
