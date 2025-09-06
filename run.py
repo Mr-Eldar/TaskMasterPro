@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 
 from app.user import user
 from app.tasks import tasks
+from app.ai_chat import ai
 from app.database.models import async_main
 
 from dotenv import load_dotenv
@@ -15,7 +16,7 @@ async def main():
     bot = Bot(token=os.getenv('TOKEN'))
     
     dp = Dispatcher()
-    dp.include_routers(user, tasks)
+    dp.include_routers(user, tasks, ai)
     dp.startup.register(startup)
     dp.shutdown.register(shutdown)
     
