@@ -6,7 +6,7 @@ from mistralai import Mistral
 model = 'mistral-large-latest'
 client = Mistral(api_key=f'{os.environ.get("MISTRAL_API_KEY")}')
 
-async def text_generator(prompt: Message.text):
+async def text_generator(prompt: str):
     chat_response = await client.chat.complete_async(
         model=model,
         messages=[
