@@ -17,7 +17,7 @@ async def send_long_message(message: Message, text: str, parse_mode: ParseMode =
     """Отправляет длинное сообщение частями с обработкой ошибок разметки"""
     try:
         if len(text) <= 4000:
-            await message.answer(text, parse_mode=ParseMode.MARKDOWN)
+            await message.answer(text, parse_mode=parse_mode)
             return
         
         chunks = [text[i:i+4000] for i in range(0, len(text), 4000)]
