@@ -22,10 +22,9 @@ async def stop_chat(message: Message, state: FSMContext):
 
 @ai.message(F.text, StateFilter(AiChat.start_chat))
 async def chatting(message: Message, state: FSMContext):
-    response = await text_generator(prompt=message.text)
     await state.set_state(WaitGenerator.wait_generator)
+    response = await text_generator(prompt=message.text)
     await message.answer(response, parse_mode=ParseMode.MARKDOWN)
-    await state.set_state(AiChat.start_chat)
 
 
 @ai.message(WaitGenerator.wait_generator)
