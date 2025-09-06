@@ -9,19 +9,37 @@ from app.generators import text_generator
 ai = Router()
 
 async def send_long_message(message: Message, text: str, parse_mode: ParseMode = None):
-    """Отправляет длинное сообщение частями"""
-    if len(text) <= 4000:
-        await message.answer(text, parse_mode=parse_mode)
-        return
-    
-    chunks = [text[i:i+4000] for i in range(0, len(text), 4000)]
-    
-    for i, chunk in enumerate(chunks):
-        if i == 0:
-            await message.answer(chunk, parse_mode=parse_mode)
+    """Отправляет длинное сообщение частями с обработкой ошибок разметки"""
+    try:
+        if len(text) <= 4000:
+            await message.answer(text, parse_mode=parse_mode)
+            return
+        
+        chunks = [text[i:i+4000] for i in range(0, len(text), 4000)]
+        
+        for i, chunk in enumerate(chunks):
+            if i == 0:
+                await message.answer(chunk, parse_mode=parse_mode)
+            else:
+                prefix = "*(продолжение)*\n" if parse_mode == ParseMode.MARKDOWN else "Продолжение:\n"
+                await message.answer(f"{prefix}{chunk}", parse_mode=parse_mode)
+                
+    except Exception as e:
+        # Если ошибка разметки, отправляем без нее
+        if "can't parse entities" in str(e):
+            if len(text) <= 4000:
+                await message.answer(text)
+                return
+            
+            chunks = [text[i:i+4000] for i in range(0, len(text), 4000)]
+            
+            for i, chunk in enumerate(chunks):
+                if i == 0:
+                    await message.answer(chunk)
+                else:
+                    await message.answer(f"Продолжение:\n{chunk}")
         else:
-            prefix = "*(продолжение)*\n" if parse_mode == ParseMode.MARKDOWN else "Продолжение:\n"
-            await message.answer(f"{prefix}{chunk}", parse_mode=parse_mode)
+            raise e
 
 
 @ai.message(Command('ai_chat'))
@@ -71,7 +89,11 @@ async def chatting(message: Message, state: FSMContext):
     try:
         full_prompt = "\n".join(history)
         response = await text_generator(prompt=full_prompt)
-        await send_long_message(message, response, ParseMode.MARKDOWN)
+        
+        # Экранируем специальные символы Markdown чтобы избежать ошибок
+        safe_response = response.replace('*', '\\*').replace('_', '\\_').replace('`', '\\`')
+        
+        await send_long_message(message, safe_response, ParseMode.MARKDOWN)
         
         history.append(f"AI: {response}")
         
