@@ -8,6 +8,11 @@ from app.generators import text_generator
 
 ai = Router()
 
+def escape_markdown(text: str) -> str:
+    """Экранирует специальные символы MarkdownV2"""
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return re.sub(f'([{re.escape(escape_chars)}])', r'\\\1', text)
+
 async def send_long_message(message: Message, text: str, parse_mode: ParseMode = None):
     """Отправляет длинное сообщение частями с обработкой ошибок разметки"""
     try:
@@ -21,23 +26,23 @@ async def send_long_message(message: Message, text: str, parse_mode: ParseMode =
             if i == 0:
                 await message.answer(chunk, parse_mode=parse_mode)
             else:
-                prefix = "*(продолжение)*\n" if parse_mode == ParseMode.MARKDOWN else "Продолжение:\n"
+                prefix = "*(продолжение)*\n" if parse_mode == ParseMode.MARKDOWN else "<i>(продолжение)</i>\n"
                 await message.answer(f"{prefix}{chunk}", parse_mode=parse_mode)
                 
     except Exception as e:
-        # Если ошибка разметки, отправляем без нее
+        # Если ошибка разметки, отправляем без нее с экранированием
         if "can't parse entities" in str(e):
-            if len(text) <= 4000:
-                await message.answer(text)
-                return
+            safe_text = escape_markdown(text) if parse_mode == ParseMode.MARKDOWN else text
             
-            chunks = [text[i:i+4000] for i in range(0, len(text), 4000)]
-            
-            for i, chunk in enumerate(chunks):
-                if i == 0:
-                    await message.answer(chunk)
-                else:
-                    await message.answer(f"Продолжение:\n{chunk}")
+            if len(safe_text) <= 4000:
+                await message.answer(safe_text)
+            else:
+                chunks = [safe_text[i:i+4000] for i in range(0, len(safe_text), 4000)]
+                for i, chunk in enumerate(chunks):
+                    if i == 0:
+                        await message.answer(chunk)
+                    else:
+                        await message.answer(f"Продолжение:\n{chunk}")
         else:
             raise e
 
