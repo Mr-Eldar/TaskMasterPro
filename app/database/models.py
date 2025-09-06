@@ -8,14 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 
 load_dotenv()
 
-# Получаем URL из переменных окружения
-DB_URL = os.getenv('DATABASE_URL')
+# Получаем URL из переменных окружения без параметров SSL
+DB_URL = os.getenv('DATABASE_URL').split('?')[0]  # Убираем параметры после '?'
 
-# Упрощенная настройка для Neon.tech
+# Простая настройка для Neon.tech
 engine = create_async_engine(
     url=DB_URL,
     echo=True,
-    # Убираем сложные настройки SSL, Neon обычно работает без них
+    connect_args={
+        "ssl": "require"  # Указываем требование SSL
+    }
 )
 
 async_session = async_sessionmaker(engine, expire_on_commit=False)
@@ -25,7 +27,7 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class User(Base):
     __tablename__ = 'users'
-    
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tg_id = mapped_column(BigInteger)
 
@@ -67,5 +69,11 @@ async def async_main():
             async with fallback_engine.begin() as conn:
                 await conn.run_sync(Base.metadata.create_all)
             print("✅ Fallback SQLite database created")
+
+            # Переключаемся на fallback
+            global engine, async_session
+            engine = fallback_engine
+            async_session = async_sessionmaker(fallback_engine, expire_on_commit=False)
+
         except Exception as fallback_error:
             print(f"❌ Fallback database also failed: {fallback_error}")
