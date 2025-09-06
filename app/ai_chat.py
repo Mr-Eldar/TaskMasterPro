@@ -23,26 +23,21 @@ async def stop_chat(message: Message, state: FSMContext):
 
 @ai.message(AiChat.start_chat)
 async def chatting(message: Message, state: FSMContext):
-    # Получаем текущую историю или создаем новую
     data = await state.get_data()
     history = data.get('chat_history', [])
     
-    # Добавляем сообщение пользователя в историю
     history.append(f"User: {message.text}")
     
     await state.set_state(WaitGenerator.wait_generator)
     processing_msg = await message.answer('Ваш запрос обрабатывается...')
     
     try:
-        # Передаем всю историю для контекста
         full_prompt = "\n".join(history)
         response = await text_generator(prompt=full_prompt)
         
-        # Добавляем ответ ИИ в историю
         history.append(f"AI: {response}")
         
-        # Сохраняем обновленную историю
-        await state.update_data(chat_history=history[-10:])  # храним последние 10 сообщений
+        await state.update_data(chat_history=history[-50:])
         
         await message.answer(response, parse_mode=ParseMode.MARKDOWN)
         
