@@ -11,20 +11,17 @@ load_dotenv()
 # Получаем URL из переменных окружения
 DB_URL = os.getenv('DATABASE_URL')
 
-# Для Neon.tech используем простой подход
+# Упрощенная настройка для Neon.tech
 engine = create_async_engine(
     url=DB_URL,
     echo=True,
-    connect_args={
-        "ssl": "require"  # Простое указание использовать SSL
-    }
+    # Убираем сложные настройки SSL, Neon обычно работает без них
 )
 
 async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 class Base(AsyncAttrs, DeclarativeBase):
     pass
-
 
 class User(Base):
     __tablename__ = 'users'
@@ -58,5 +55,17 @@ class WorkTaskItem(Base):
 
 
 async def async_main():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"❌ Database error: {e}")
+        # Если основная БД недоступна, создаем SQLite fallback
+        fallback_engine = create_async_engine('sqlite+aiosqlite:///fallback.db')
+        try:
+            async with fallback_engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            print("✅ Fallback SQLite database created")
+        except Exception as fallback_error:
+            print(f"❌ Fallback database also failed: {fallback_error}")

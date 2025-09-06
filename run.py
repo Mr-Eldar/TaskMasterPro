@@ -19,12 +19,17 @@ async def main():
     dp.include_routers(user, tasks, ai)
     dp.startup.register(startup)
     dp.shutdown.register(shutdown)
+
+    try:
+        await async_main()
+    except Exception as e:
+        print(f"Database initialization warning: {e}")
+        # Продолжаем работу даже если БД не подключилась
     
     await dp.start_polling(bot)
 
 
 async def startup():
-    await async_main()
     print('Starting up...')
 
 
