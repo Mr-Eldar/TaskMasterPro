@@ -39,3 +39,11 @@ class EditTaskItem(StatesGroup):
 
 class BackNow(StatesGroup):
     backNow = State()
+
+
+class AiChat(StatesGroup):
+    start_chat = State()
+    stop_chat = State()
+
+class WaitGenerator(StatesGroup):
+    wait_generator = State()
