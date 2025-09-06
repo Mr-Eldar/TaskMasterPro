@@ -9,7 +9,7 @@ from app.database.requests import *
 ITEM_PER_PAGE = 6
 
 start_kb = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True, keyboard=[
-    [KeyboardButton(text='Задачи 📝')],
+    [KeyboardButton(text='Задачи 📝'), KeyboardButton(text='чат с ИИ 💬')],
     [KeyboardButton(text='Управление планами ⚙️')]
 ])
 

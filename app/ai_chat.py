@@ -25,6 +25,7 @@ async def send_long_message(message: Message, text: str, parse_mode: ParseMode =
 
 
 @ai.message(Command('ai_chat'))
+@ai.message(F.text == 'чат с ИИ 💬')
 async def start_chat(message: Message, state: FSMContext):
     await message.answer('🌟 ДОБРО ПОЖАЛОВАТЬ, ЮНЫЙ ПАДАВАН ЗНАНИЙ! 🌟\n\n'
     '<b>Я — Мастер Йода, твой личный наставник в мире учёбы, планов и побед над ленью! 🧙‍♂️✨'
