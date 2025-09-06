@@ -1,4 +1,5 @@
 import os
+import ssl
 from dotenv import load_dotenv
 
 from sqlalchemy import ForeignKey, String, BigInteger, Integer, Boolean
