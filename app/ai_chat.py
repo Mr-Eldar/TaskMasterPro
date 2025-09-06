@@ -32,7 +32,7 @@ async def send_long_message(message: Message, text: str, parse_mode: ParseMode =
     except Exception as e:
         # Если ошибка разметки, отправляем без нее с экранированием
         if "can't parse entities" in str(e):
-            safe_text = parse_mode == ParseMode.MARKDOWN else text
+            safe_text = ParseMode.MARKDOWN else text
             
             if len(safe_text) <= 4000:
                 await message.answer(safe_text)
