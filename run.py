@@ -13,20 +13,25 @@ from dotenv import load_dotenv
 
 async def main():
     load_dotenv()
-    bot = Bot(token=os.getenv('TOKEN'))
-    
-    dp = Dispatcher()
-    dp.include_routers(user, tasks, ai)
-    dp.startup.register(startup)
-    dp.shutdown.register(shutdown)
-
     try:
-        await async_main()
+        bot = Bot(token=os.getenv('TOKEN'))
+
+        dp = Dispatcher()
+        dp.include_routers(user, tasks, ai)
+        dp.startup.register(startup)
+        dp.shutdown.register(shutdown)
+        # Инициализируем базу данных
+        try:
+            await async_main()
+        except Exception as e:
+            from app.database.models import init_database
+            init_database()
+            await async_main()
+
+        # Запускаем бота
+        await dp.start_polling(bot)
     except Exception as e:
-        print(f"Database initialization warning: {e}")
-        # Продолжаем работу даже если БД не подключилась
-    
-    await dp.start_polling(bot)
+        print(e)
 
 
 async def startup():

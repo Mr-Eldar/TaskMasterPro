@@ -8,19 +8,39 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 
 load_dotenv()
 
-# Получаем URL из переменных окружения без параметров SSL
-DB_URL = os.getenv('DATABASE_URL').split('?')[0]  # Убираем параметры после '?'
+DB_URL = os.getenv('DATABASE_URL')
+if DB_URL and '?' in DB_URL:
+    DB_URL = DB_URL.split('?')[0]  # Убираем параметры после '?'
 
-# Простая настройка для Neon.tech
-engine = create_async_engine(
-    url=DB_URL,
-    echo=True,
-    connect_args={
-        "ssl": "require"  # Указываем требование SSL
-    }
-)
+# Переменные для engine и session
+engine = None
+async_session = None
 
-async_session = async_sessionmaker(engine, expire_on_commit=False)
+
+def init_database():
+    global engine, async_session
+
+    try:
+        # Пытаемся подключиться к основной БД
+        engine = create_async_engine(
+            url=DB_URL,
+            echo=True,
+            connect_args={
+                "ssl": "require"  # Указываем требование SSL
+            }
+        )
+        async_session = async_sessionmaker(engine, expire_on_commit=False)
+        print("✅ Main database initialized")
+    except Exception as e:
+        print(f"❌ Main database failed: {e}")
+        # Если основная БД недоступна, используем SQLite fallback
+        engine = create_async_engine('sqlite+aiosqlite:///fallback.db', echo=True)
+        async_session = async_sessionmaker(engine, expire_on_commit=False)
+        print("✅ Fallback SQLite database initialized")
+
+
+# Инициализируем базу данных при импорте модуля
+init_database()
 
 class Base(AsyncAttrs, DeclarativeBase):
     pass
@@ -58,22 +78,11 @@ class WorkTaskItem(Base):
 
 async def async_main():
     try:
+        if engine is None:
+            init_database()
+
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         print("✅ Database tables created successfully")
     except Exception as e:
         print(f"❌ Database error: {e}")
-        # Если основная БД недоступна, создаем SQLite fallback
-        fallback_engine = create_async_engine('sqlite+aiosqlite:///fallback.db')
-        try:
-            async with fallback_engine.begin() as conn:
-                await conn.run_sync(Base.metadata.create_all)
-            print("✅ Fallback SQLite database created")
-
-            # Переключаемся на fallback
-            global engine, async_session
-            engine = fallback_engine
-            async_session = async_sessionmaker(fallback_engine, expire_on_commit=False)
-
-        except Exception as fallback_error:
-            print(f"❌ Fallback database also failed: {fallback_error}")
