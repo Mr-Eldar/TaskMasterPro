@@ -7,11 +7,22 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 
 load_dotenv()
 
-engine = create_async_engine(url=os.getenv('DB_URL'),
-                             echo=True)
-    
-async_session = async_sessionmaker(engine)
+# Настройка SSL для Neon.tech
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
+DB_URL = os.getenv('DATABASE_URL')
+
+engine = create_async_engine(
+    url=DB_URL,
+    echo=True,
+    connect_args={
+        "ssl": ssl_context
+    }
+)
+
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 class Base(AsyncAttrs, DeclarativeBase):
     pass
