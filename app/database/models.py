@@ -8,18 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_
 
 load_dotenv()
 
-# Настройка SSL для Neon.tech
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
-
+# Получаем URL из переменных окружения
 DB_URL = os.getenv('DATABASE_URL')
 
+# Для Neon.tech используем простой подход
 engine = create_async_engine(
     url=DB_URL,
     echo=True,
     connect_args={
-        "ssl": ssl_context
+        "ssl": "require"  # Простое указание использовать SSL
     }
 )
 
